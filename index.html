@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Message Transmission & E2EE Protocol Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-group">
+        <div class="wa-icon-bubble">
+          <svg viewBox="0 0 24 24" class="wa-svg" fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.37C9.36 7.37 9.08 7.43 8.84 7.69C8.61 7.94 7.94 8.57 7.94 9.87C7.94 11.17 8.89 12.43 9.02 12.6C9.15 12.78 10.87 15.42 13.5 16.56C14.13 16.83 14.62 17 15 17.12C15.64 17.32 16.22 17.3 16.68 17.23C17.19 17.15 18.27 16.58 18.5 15.93C18.73 15.28 18.73 14.72 18.66 14.61C18.59 14.5 18.41 14.43 18.14 14.3C17.88 14.17 16.58 13.53 16.34 13.44C16.1 13.35 15.93 13.31 15.76 13.57C15.59 13.83 15.09 14.43 14.94 14.6C14.79 14.77 14.64 14.8 14.38 14.67C14.12 14.54 13.28 14.26 12.28 13.37C11.5 12.67 10.98 11.81 10.83 11.55C10.68 11.29 10.81 11.15 10.94 11.02C11.06 10.9 11.2 10.72 11.34 10.56C11.47 10.4 11.52 10.27 11.61 10.1C11.69 9.93 11.65 9.78 11.58 9.65C11.52 9.52 10.99 8.23 10.77 7.71C10.56 7.2 10.35 7.27 10.18 7.27C10.02 7.26 9.83 7.26 9.64 7.26"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">WhatsApp Transmission Lab</h1>
+          <p class="brand-subtitle">End-to-End Encrypted Message Lifecycle &amp; Network Protocol Visualizer</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <span class="badge simulation-badge">
+        <span class="pulsing-dot"></span>
+        Educational Network Simulation
+      </span>
+      <span class="badge protocol-badge">Signal Protocol + TLS 1.3</span>
+    </div>
+
+    <div class="header-right">
+      <div class="audio-toggle-container">
+        <button id="audioToggleBtn" class="btn btn-icon" title="Toggle Sound Effects">
+          <span id="audioIcon">🔊</span>
+          <span class="btn-text">Audio</span>
+        </button>
+      </div>
+      <div class="speed-control">
+        <label for="simSpeed">Speed:</label>
+        <select id="simSpeed">
+          <option value="0.6">0.6x (Slow / Detail)</option>
+          <option value="1" selected>1.0x (Normal)</option>
+          <option value="1.8">1.8x (Fast)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Control Bar -->
+  <section class="control-panel">
+    <div class="control-bar-inner">
+      <div class="message-composer-bar">
+        <label for="msgInput" class="input-label">Plaintext Message to Transmit:</label>
+        <div class="input-with-presets">
+          <input type="text" id="msgInput" maxlength="90" value="Hey Bob! Our Computer Networks project is ready 🚀" placeholder="Type a message to simulate...">
+          <div class="preset-dropdown">
+            <button type="button" class="btn btn-outline btn-sm" id="presetBtn">Presets ▾</button>
+            <div class="dropdown-menu" id="presetMenu">
+              <button class="preset-item" data-text="Hey Bob! Our Computer Networks project is ready 🚀">CN Project Ready 🚀</button>
+              <button class="preset-item" data-text="Meet me at the Computer Science Lab at 4:30 PM!">Lab Meeting at 4:30 💻</button>
+              <button class="preset-item" data-text="Secret Key: 7F9A-4B2E-E2EE-PROTECTED-AES256">Cryptographic Key Demo 🔑</button>
+              <button class="preset-item" data-text="Did you check the DNS records and TCP 3-way handshake?">TCP/DNS Exam Question 🌐</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="startDemoBtn" class="btn btn-primary">
+          <span class="icon">▶</span> Start Full Demo
+        </button>
+        <button id="stepDemoBtn" class="btn btn-secondary" title="Advance one stage at a time">
+          <span class="icon">⏭</span> Next Stage
+        </button>
+        <button id="pauseDemoBtn" class="btn btn-secondary" disabled>
+          <span class="icon">⏸</span> Pause
+        </button>
+        <button id="resetDemoBtn" class="btn btn-danger">
+          <span class="icon">🔄</span> Reset
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Labelled Stages Progress Stepper -->
+  <nav class="stages-stepper" aria-label="Simulation Stages">
+    <div class="stepper-track">
+      <div class="stepper-progress-fill" id="stepperFill"></div>
+    </div>
+    
+    <div class="stage-step" data-stage="1" id="step-node-1">
+      <div class="step-circle">1</div>
+      <div class="step-meta">
+        <span class="step-name">Stage 1</span>
+        <span class="step-title">Sender (Alice)</span>
+        <span class="step-sub">Input &amp; E2EE Encrypt</span>
+      </div>
+    </div>
+
+    <div class="stage-step" data-stage="2" id="step-node-2">
+      <div class="step-circle">2</div>
+      <div class="step-meta">
+        <span class="step-name">Stage 2</span>
+        <span class="step-title">Network &amp; DNS</span>
+        <span class="step-sub">Resolve &amp; TCP Handshake</span>
+      </div>
+    </div>
+
+    <div class="stage-step" data-stage="3" id="step-node-3">
+      <div class="step-circle">3</div>
+      <div class="step-meta">
+        <span class="step-name">Stage 3</span>
+        <span class="step-title">WhatsApp Server</span>
+        <span class="step-sub">Blind Relay &amp; Queue</span>
+      </div>
+    </div>
+
+    <div class="stage-step" data-stage="4" id="step-node-4">
+      <div class="step-circle">4</div>
+      <div class="step-meta">
+        <span class="step-name">Stage 4</span>
+        <span class="step-title">Receiver (Bob)</span>
+        <span class="step-sub">Decrypt &amp; Render</span>
+      </div>
+    </div>
+
+    <div class="stage-step" data-stage="5" id="step-node-5">
+      <div class="step-circle">5</div>
+      <div class="step-meta">
+        <span class="step-name">Stage 5</span>
+        <span class="step-title">Security &amp; ACKs</span>
+        <span class="step-sub">1-Tick ➔ 2-Tick ➔ Blue</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Live Animated Network Topology Pipeline Banner -->
+  <section class="network-canvas-section">
+    <div class="section-badge-bar">
+      <span class="section-tag">Interactive Topology &amp; Packet Flow Animation</span>
+      <span id="currentPhaseLabel" class="phase-indicator">System Idle • Click "Start Full Demo" or enter a message</span>
+    </div>
+
+    <div class="topology-wrapper">
+      <div class="topology-node" id="topo-alice">
+        <div class="node-icon-box alice-box">📱</div>
+        <div class="node-info">
+          <strong>Alice (Sender)</strong>
+          <span>192.168.1.104:54321</span>
+        </div>
+      </div>
+
+      <div class="topology-segment" id="seg-1">
+        <div class="segment-line">
+          <div class="packet-particle" id="packetParticle1"></div>
+        </div>
+        <span class="seg-label" id="segLabel1">DNS Lookup / SYN</span>
+      </div>
+
+      <div class="topology-node" id="topo-dns">
+        <div class="node-icon-box dns-box">🌐</div>
+        <div class="node-info">
+          <strong>DNS Resolver</strong>
+          <span>8.8.8.8:53 (UDP)</span>
+        </div>
+      </div>
+
+      <div class="topology-segment" id="seg-2">
+        <div class="segment-line">
+          <div class="packet-particle" id="packetParticle2"></div>
+        </div>
+        <span class="seg-label" id="segLabel2">TLS 1.3 / E2EE Payload</span>
+      </div>
+
+      <div class="topology-node" id="topo-server">
+        <div class="node-icon-box server-box">🏢</div>
+        <div class="node-info">
+          <strong>WhatsApp Edge Server</strong>
+          <span>157.240.22.53:443 (TCP)</span>
+        </div>
+      </div>
+
+      <div class="topology-segment" id="seg-3">
+        <div class="segment-line">
+          <div class="packet-particle" id="packetParticle3"></div>
+        </div>
+        <span class="seg-label" id="segLabel3">Push Notification / Delivery</span>
+      </div>
+
+      <div class="topology-node" id="topo-bob">
+        <div class="node-icon-box bob-box">📲</div>
+        <div class="node-info">
+          <strong>Bob (Receiver)</strong>
+          <span>10.0.0.82:58920</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main 5-Stage Interactive Dashboard Grid -->
+  <main class="dashboard-grid">
+
+    <!-- STAGE 1: SENDER PANEL -->
+    <article class="stage-card" id="card-stage-1">
+      <header class="card-header stage-header-1">
+        <div class="stage-title-wrap">
+          <span class="stage-pill">Stage 1</span>
+          <h3>Sender Interface (Alice)</h3>
+        </div>
+        <span class="status-indicator" id="senderStatus">Ready</span>
+      </header>
+
+      <div class="card-body">
+        <!-- Phone Device Mockup -->
+        <div class="phone-frame">
+          <div class="phone-top-bar">
+            <span>9:41</span>
+            <div class="phone-camera"></div>
+            <span>5G 📶 100%</span>
+          </div>
+
+          <div class="wa-chat-header">
+            <div class="wa-avatar">B</div>
+            <div class="wa-user-details">
+              <span class="wa-name">Bob (Project Partner)</span>
+              <span class="wa-sub" id="aliceChatStatus">online</span>
+            </div>
+            <div class="wa-chat-actions">
+              <span>📞</span>
+              <span>📹</span>
+              <span>⋮</span>
+            </div>
+          </div>
+
+          <div class="wa-chat-body" id="aliceChatBody">
+            <div class="e2ee-banner">
+              🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.
+            </div>
+            <div class="chat-date-pill">Today</div>
+            
+            <!-- Message will render here -->
+            <div class="chat-bubble-container" id="aliceBubbleArea">
+              <!-- Dynamically populated or updated -->
+            </div>
+          </div>
+
+          <div class="wa-chat-footer">
+            <span class="wa-icon-btn">😊</span>
+            <span class="wa-icon-btn">📎</span>
+            <div class="mock-input" id="aliceMockInput">Type a message...</div>
+            <button class="wa-mic-btn" id="aliceSendActionBtn">➤</button>
+          </div>
+        </div>
+
+        <!-- Sender Cryptographic Details Box -->
+        <div class="crypto-subbox">
+          <div class="crypto-box-title">
+            <span>🔑 Client E2EE Key Derivation (Signal Protocol)</span>
+            <span class="badge-mini" id="senderCryptoBadge">Curve25519</span>
+          </div>
+          <div class="crypto-grid">
+            <div class="crypto-row">
+              <span class="c-label">Sender Identity:</span>
+              <span class="c-val mono">IK_Alice (Ed25519)</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Ephemeral Key:</span>
+              <span class="c-val mono" id="aliceEphemeralKey">EK_a: 0x9e4f..88b1</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Ratchet Step:</span>
+              <span class="c-val" id="aliceRatchetStep">Chain Key #14</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Cipher Algorithm:</span>
+              <span class="c-val mono">AES-256-GCM + HMAC-SHA256</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- STAGE 2: NETWORK & DNS RESOLUTION -->
+    <article class="stage-card" id="card-stage-2">
+      <header class="card-header stage-header-2">
+        <div class="stage-title-wrap">
+          <span class="stage-pill">Stage 2</span>
+          <h3>Network &amp; DNS Resolution</h3>
+        </div>
+        <span class="status-indicator" id="networkStatus">Waiting</span>
+      </header>
+
+      <div class="card-body network-content">
+        <!-- Sub-step A: DNS Resolution -->
+        <div class="proto-section">
+          <div class="proto-header">
+            <span class="proto-num">2.1</span>
+            <h4>DNS Resolution (Domain ➔ IP)</h4>
+            <span class="badge-mini" id="dnsBadge">Pending</span>
+          </div>
+
+          <div class="dns-animation-box" id="dnsBox">
+            <div class="dns-step-item" id="dnsStep1">
+              <span class="dns-tag query">QUERY</span>
+              <span class="dns-desc">Alice asks DNS: <code>What is IP of c.whatsapp.net?</code></span>
+            </div>
+            <div class="dns-step-item" id="dnsStep2">
+              <span class="dns-tag lookup">LOOKUP</span>
+              <span class="dns-desc">Resolving via Root Hints &amp; Authoritative DNS...</span>
+            </div>
+            <div class="dns-step-item" id="dnsStep3">
+              <span class="dns-tag response">A RECORD</span>
+              <span class="dns-desc"><code>c.whatsapp.net ➔ 157.240.22.53 (TTL=60s)</code></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-step B: TCP 3-Way Handshake -->
+        <div class="proto-section">
+          <div class="proto-header">
+            <span class="proto-num">2.2</span>
+            <h4>TCP 3-Way Handshake (RFC 793)</h4>
+            <span class="badge-mini" id="tcpBadge">Closed</span>
+          </div>
+
+          <div class="tcp-handshake-diagram" id="tcpDiagram">
+            <div class="tcp-col">
+              <span class="tcp-actor">Alice (Client)</span>
+              <div class="tcp-line-v"></div>
+            </div>
+            
+            <div class="tcp-flows">
+              <div class="tcp-arrow arrow-syn" id="arrowSyn">
+                <div class="arrow-content">
+                  <span class="packet-name">1. [SYN]</span>
+                  <span class="packet-flags">Seq=1000, Win=65535, MSS=1460</span>
+                </div>
+                <div class="arrow-visual right">➔</div>
+              </div>
+
+              <div class="tcp-arrow arrow-synack" id="arrowSynAck">
+                <div class="arrow-visual left">⬅</div>
+                <div class="arrow-content">
+                  <span class="packet-name">2. [SYN, ACK]</span>
+                  <span class="packet-flags">Seq=5000, Ack=1001, Win=64240</span>
+                </div>
+              </div>
+
+              <div class="tcp-arrow arrow-ack" id="arrowAck">
+                <div class="arrow-content">
+                  <span class="packet-name">3. [ACK]</span>
+                  <span class="packet-flags">Seq=1001, Ack=5001 (ESTABLISHED)</span>
+                </div>
+                <div class="arrow-visual right">➔</div>
+              </div>
+            </div>
+
+            <div class="tcp-col">
+              <span class="tcp-actor">WA Server</span>
+              <div class="tcp-line-v"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-step C: TLS 1.3 Secure Socket -->
+        <div class="proto-section">
+          <div class="proto-header">
+            <span class="proto-num">2.3</span>
+            <h4>TLS 1.3 Transport Security Handshake</h4>
+            <span class="badge-mini" id="tlsBadge">Not Started</span>
+          </div>
+          <div class="tls-status-box" id="tlsStatusBox">
+            <div class="tls-step" id="tlsStep1">🤝 ClientHello (Supported Ciphers + Key Share)</div>
+            <div class="tls-step" id="tlsStep2">📜 ServerHello + WhatsApp Identity Cert + Finished</div>
+            <div class="tls-step" id="tlsStep3">🔐 TLS Channel Secured with AES_128_GCM_SHA256</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- STAGE 3: SERVER RELAY PANEL -->
+    <article class="stage-card" id="card-stage-3">
+      <header class="card-header stage-header-3">
+        <div class="stage-title-wrap">
+          <span class="stage-pill">Stage 3</span>
+          <h3>WhatsApp Edge Server</h3>
+        </div>
+        <span class="status-indicator" id="serverStatus">Idle</span>
+      </header>
+
+      <div class="card-body">
+        <!-- Zero Knowledge Assurance Alert -->
+        <div class="server-zero-knowledge-box">
+          <div class="zk-icon">🛡️</div>
+          <div class="zk-text">
+            <strong>Zero-Knowledge Application Layer</strong>
+            <p>The WhatsApp server only acts as a store-and-forward blind router. It routes the payload using recipient IDs without possessing Bob's private decryption keys.</p>
+          </div>
+        </div>
+
+        <!-- Server In-Memory Socket Table -->
+        <div class="server-table-section">
+          <div class="server-sec-title">Active Gateway Socket Registry</div>
+          <table class="socket-table">
+            <thead>
+              <tr>
+                <th>User / Phone ID</th>
+                <th>Socket FD</th>
+                <th>State</th>
+                <th>Queue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="rowAlice">
+                <td><code>+1-555-0104 (Alice)</code></td>
+                <td><code>fd#4102</code></td>
+                <td><span class="badge-dot green"></span> Connected</td>
+                <td>0 msgs</td>
+              </tr>
+              <tr id="rowBob">
+                <td><code>+1-555-0182 (Bob)</code></td>
+                <td><code>fd#5190</code></td>
+                <td id="bobSocketState"><span class="badge-dot green"></span> Connected</td>
+                <td id="bobQueueState">0 msgs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Server Payload Inspection Box -->
+        <div class="server-payload-inspector">
+          <div class="inspector-header">
+            <span>Incoming Encrypted Frame Received by Server:</span>
+            <span class="badge-danger-outline" id="serverInspectBadge">Ciphertext Locked</span>
+          </div>
+          <div class="payload-raw-box" id="serverRawBox">
+            <span class="payload-placeholder">Awaiting transmission packet...</span>
+          </div>
+          <div class="routing-action-indicator" id="routingActionText">
+            Routing Action: Waiting for inbound data segment
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- STAGE 4: RECEIVER PANEL -->
+    <article class="stage-card" id="card-stage-4">
+      <header class="card-header stage-header-4">
+        <div class="stage-title-wrap">
+          <span class="stage-pill">Stage 4</span>
+          <h3>Receiver Interface (Bob)</h3>
+        </div>
+        <span class="status-indicator" id="receiverStatus">Waiting</span>
+      </header>
+
+      <div class="card-body">
+        <!-- Bob's Phone Device Mockup -->
+        <div class="phone-frame">
+          <div class="phone-top-bar">
+            <span>9:41</span>
+            <div class="phone-camera"></div>
+            <span>5G 📶 98%</span>
+          </div>
+
+          <div class="wa-chat-header">
+            <div class="wa-avatar">A</div>
+            <div class="wa-user-details">
+              <span class="wa-name">Alice</span>
+              <span class="wa-sub">online</span>
+            </div>
+            <div class="wa-chat-actions">
+              <span>📞</span>
+              <span>📹</span>
+              <span>⋮</span>
+            </div>
+          </div>
+
+          <div class="wa-chat-body" id="bobChatBody">
+            <div class="e2ee-banner">
+              🔒 Messages and calls are end-to-end encrypted.
+            </div>
+            <div class="chat-date-pill">Today</div>
+
+            <div class="chat-bubble-container" id="bobBubbleArea">
+              <!-- Dynamically populated -->
+              <div class="chat-empty-state" id="bobEmptyState">
+                No new messages yet. Waiting for transmission...
+              </div>
+            </div>
+          </div>
+
+          <div class="wa-chat-footer">
+            <span class="wa-icon-btn">😊</span>
+            <span class="wa-icon-btn">📎</span>
+            <div class="mock-input">Reply to Alice...</div>
+            <button class="wa-mic-btn">➤</button>
+          </div>
+        </div>
+
+        <!-- Bob's Local Decryption Subsystem -->
+        <div class="crypto-subbox">
+          <div class="crypto-box-title">
+            <span>🔓 Receiver Decryption Engine</span>
+            <span class="badge-mini" id="bobDecryptionBadge">Standby</span>
+          </div>
+          <div class="crypto-grid">
+            <div class="crypto-row">
+              <span class="c-label">Private Key:</span>
+              <span class="c-val mono">Bob_PrivKey (Curve25519)</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Derived Secret:</span>
+              <span class="c-val mono" id="bobSharedSecret">ECDH(Bob_Priv, Alice_Pub)</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Integrity Status:</span>
+              <span class="c-val" id="bobAuthTagStatus">HMAC Tag Valid ✅</span>
+            </div>
+            <div class="crypto-row">
+              <span class="c-label">Message State:</span>
+              <span class="c-val" id="bobMsgState">Awaiting payload</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- STAGE 5: NETWORK SECURITY & ACKNOWLEDGEMENTS -->
+    <article class="stage-card full-width-card" id="card-stage-5">
+      <header class="card-header stage-header-5">
+        <div class="stage-title-wrap">
+          <span class="stage-pill">Stage 5</span>
+          <h3>Network Security &amp; Delivery Acknowledgement Lifecycle</h3>
+        </div>
+        <span class="status-indicator" id="securityStatus">Idle</span>
+      </header>
+
+      <div class="card-body security-body-layout">
+        <!-- Left: Live Cipher Scramble & Hash Comparison -->
+        <div class="sec-column">
+          <div class="subcard-title">
+            <span>🔐 Real-Time Cryptographic Transformation (Plaintext ➔ Ciphertext)</span>
+          </div>
+          <div class="scramble-visualizer">
+            <div class="scramble-step">
+              <label>1. Plaintext Message (Application Memory):</label>
+              <div class="data-display plain" id="visPlaintext">Hey Bob! Our Computer Networks project is ready 🚀</div>
+            </div>
+
+            <div class="scramble-arrow">⬇ AES-256-GCM Encryption with Ephemeral Shared Key</div>
+
+            <div class="scramble-step">
+              <label>2. Encrypted Ciphertext Payload (Over-The-Wire):</label>
+              <div class="data-display cipher" id="visCiphertext">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855...</div>
+            </div>
+
+            <div class="scramble-arrow">⬇ Bob's Device Decryption via Double Ratchet</div>
+
+            <div class="scramble-step">
+              <label>3. Decrypted Text (Bob's Secure Enclave):</label>
+              <div class="data-display plain" id="visDecrypted">Awaiting decryption step...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: The 3 WhatsApp Ticks Explained with Real-Time State Indicator -->
+        <div class="sec-column">
+          <div class="subcard-title">
+            <span>✓ The Three WhatsApp Delivery Acknowledgements</span>
+          </div>
+
+          <div class="ticks-evolution-grid">
+            <!-- Tick 0: Clock / Pending -->
+            <div class="tick-card" id="tickCardPending">
+              <div class="tick-icon-circle pending">🕒</div>
+              <div class="tick-details">
+                <strong>Clock (Pending)</strong>
+                <p>Message queued in phone's local SQLite database / outbound buffer. Waiting for active TCP socket connection.</p>
+              </div>
+              <span class="tick-pill" id="badgeClock">Pending</span>
+            </div>
+
+            <!-- Tick 1: Sent (Single Grey Tick) -->
+            <div class="tick-card" id="tickCardSent">
+              <div class="tick-icon-circle sent">
+                <svg viewBox="0 0 16 15" width="18" height="18" fill="currentColor">
+                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L6.118 12.385l-4.4-3.693a.365.365 0 0 0-.512.046l-.42.436a.365.365 0 0 0 .046.512l5.068 4.254c.068.057.155.088.243.088h.023c.091 0 .179-.033.245-.094l8.528-10.053a.365.365 0 0 0 .063-.565z"/>
+                </svg>
+              </div>
+              <div class="tick-details">
+                <strong>Single Grey Tick (Sent)</strong>
+                <p>Encrypted packet arrived at WhatsApp edge server. WhatsApp server stored ciphertext and returned TCP ACK + Message ID Receipt.</p>
+              </div>
+              <span class="tick-pill" id="badgeSent">Not Reached</span>
+            </div>
+
+            <!-- Tick 2: Delivered (Double Grey Tick) -->
+            <div class="tick-card" id="tickCardDelivered">
+              <div class="tick-icon-circle delivered">
+                <svg viewBox="0 0 16 15" width="18" height="18" fill="currentColor">
+                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L6.118 12.385l-4.4-3.693a.365.365 0 0 0-.512.046l-.42.436a.365.365 0 0 0 .046.512l5.068 4.254c.068.057.155.088.243.088h.023c.091 0 .179-.033.245-.094l8.528-10.053a.365.365 0 0 0 .063-.565z"/>
+                </svg>
+                <svg viewBox="0 0 16 15" width="18" height="18" fill="currentColor" style="margin-left:-8px;">
+                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L6.118 12.385l-4.4-3.693a.365.365 0 0 0-.512.046l-.42.436a.365.365 0 0 0 .046.512l5.068 4.254c.068.057.155.088.243.088h.023c.091 0 .179-.033.245-.094l8.528-10.053a.365.365 0 0 0 .063-.565z"/>
+                </svg>
+              </div>
+              <div class="tick-details">
+                <strong>Double Grey Tick (Delivered)</strong>
+                <p>Payload pushed to Bob's phone over his open TCP/Push socket. Bob's device sent back an encrypted delivery acknowledgement packet.</p>
+              </div>
+              <span class="tick-pill" id="badgeDelivered">Not Reached</span>
+            </div>
+
+            <!-- Tick 3: Read (Double Blue Tick) -->
+            <div class="tick-card" id="tickCardRead">
+              <div class="tick-icon-circle read">
+                <svg viewBox="0 0 16 15" width="18" height="18" fill="#53bdeb">
+                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L6.118 12.385l-4.4-3.693a.365.365 0 0 0-.512.046l-.42.436a.365.365 0 0 0 .046.512l5.068 4.254c.068.057.155.088.243.088h.023c.091 0 .179-.033.245-.094l8.528-10.053a.365.365 0 0 0 .063-.565z"/>
+                </svg>
+                <svg viewBox="0 0 16 15" width="18" height="18" fill="#53bdeb" style="margin-left:-8px;">
+                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L6.118 12.385l-4.4-3.693a.365.365 0 0 0-.512.046l-.42.436a.365.365 0 0 0 .046.512l5.068 4.254c.068.057.155.088.243.088h.023c.091 0 .179-.033.245-.094l8.528-10.053a.365.365 0 0 0 .063-.565z"/>
+                </svg>
+              </div>
+              <div class="tick-details">
+                <strong>Double Blue Tick (Read)</strong>
+                <p>Bob unlocked his screen and viewed Alice's chat thread. A <code>ReadReceiptMessage</code> event was relayed back to Alice.</p>
+              </div>
+              <span class="tick-pill" id="badgeRead">Not Reached</span>
+            </div>
+          </div>
+
+          <!-- TLS vs E2EE Comparison Callout for Presentation -->
+          <div class="tls-vs-e2ee-comparison">
+            <div class="comp-col">
+              <span class="comp-title">🌐 TLS 1.3 (Transport Security)</span>
+              <p>Encrypts link between <strong>Client ⇄ Server</strong>. Protects against Wi-Fi eavesdroppers and ISPs. Server terminates TLS and sees decrypted stream.</p>
+            </div>
+            <div class="comp-divider">VS</div>
+            <div class="comp-col">
+              <span class="comp-title">🔒 Signal Protocol (E2EE)</span>
+              <p>Encrypts data between <strong>Alice ⇄ Bob</strong>. Server only carries impenetrable ciphertext. Even rogue server admins cannot inspect messages.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Live Event & Protocol Inspection Log -->
+  <footer class="event-log-container">
+    <div class="log-header">
+      <div class="log-title">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <h4>Live Protocol &amp; Network Event Terminal</h4>
+        <span class="badge-mini" id="logCountBadge">0 events</span>
+      </div>
+
+      <div class="log-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="NET">Network &amp; DNS</button>
+        <button class="filter-btn" data-filter="CRYPTO">Crypto &amp; E2EE</button>
+        <button class="filter-btn" data-filter="SERVER">Server Relay</button>
+        <button class="filter-btn" data-filter="ACK">Acknowledgements</button>
+        <button class="btn btn-outline btn-xs" id="clearLogBtn">Clear</button>
+        <button class="btn btn-outline btn-xs" id="copyLogBtn">Copy Log</button>
+      </div>
+    </div>
+
+    <div class="log-body" id="eventLogStream">
+      <!-- Live logs append here -->
+      <div class="log-entry system-entry">
+        <span class="log-time">[00:00.000]</span>
+        <span class="log-badge badge-sys">SYSTEM</span>
+        <span class="log-msg">Simulator initialized. Ready for demonstration. Type a message or click "Start Full Demo".</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
